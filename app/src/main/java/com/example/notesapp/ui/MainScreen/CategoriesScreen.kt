@@ -1,4 +1,4 @@
-package com.example.notesapp.ui.screen
+package com.example.notesapp.ui.MainScreen
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -27,7 +27,7 @@ fun CategoriesScreen(
     var showAddDialog by remember { mutableStateOf(false) }
     var confirmRemove by remember { mutableStateOf<String?>(null) }
 
-    // Ensure fixed first two categories in display: "Tất cả", "Chưa phân loại"
+    // Ensure fixed first two c ategories in display: "Tất cả", "Chưa phân loại"
     val listForDisplay = listOf("Tất cả", "Chưa phân loại") + categories.filter { it != "Tất cả" && it != "Chưa phân loại" }
 
     Scaffold(

@@ -1,4 +1,4 @@
-package com.example.notesapp.ui.screen
+package com.example.notesapp.ui.MainScreen
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons

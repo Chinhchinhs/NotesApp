@@ -1,4 +1,4 @@
-package com.example.notesapp.ui.screen
+package com.example.notesapp.ui.MainScreen
 
 import android.widget.Toast
 import androidx.compose.foundation.ExperimentalFoundationApi

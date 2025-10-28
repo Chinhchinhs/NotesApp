@@ -16,12 +16,15 @@ import com.example.notesapp.data.NoteRepository
 import com.example.notesapp.model.Note
 import com.example.notesapp.ui.NoteViewModel
 import com.example.notesapp.ui.NoteViewModelFactory
-import com.example.notesapp.ui.screen.CategoriesScreen
-import com.example.notesapp.ui.screen.NoteAddScreen
-import com.example.notesapp.ui.screen.NoteEditScreen
-import com.example.notesapp.ui.screen.NotesHomeScreen
-import com.example.notesapp.ui.screen.SettingsScreen
+import com.example.notesapp.ui.MainScreen.CategoriesScreen
+import com.example.notesapp.ui.MainScreen.NoteAddScreen
+import com.example.notesapp.ui.MainScreen.NoteEditScreen
+import com.example.notesapp.ui.MainScreen.NotesHomeScreen
+import com.example.notesapp.ui.MainScreen.SettingsScreen
 import com.example.notesapp.ui.theme.NotesAppTheme
+import androidx.compose.runtime.LaunchedEffect
+import com.example.notesapp.ui.AuthScreen.LoginScreen
+
 
 class MainActivity : ComponentActivity() {
 
@@ -33,17 +36,25 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        viewModel.loadUserFromPrefs() //  tự động load user offline khi mở app
         setContent {
             val darkMode by viewModel.darkMode.collectAsState()
             val fontSizeIndex by viewModel.fontSizeIndex.collectAsState()
 
             NotesAppTheme(darkTheme = darkMode, fontSizeIndex = fontSizeIndex) {
                 val navController = rememberNavController()
+                LaunchedEffect(Unit) {
+                    viewModel.loadUserFromPrefs()
+                }
 
                 NavHost(
                     navController = navController,
                     startDestination = "home"
                 ) {
+                    composable(route="login"){ LoginScreen(
+                        navController=navController,
+                        viewModel=viewModel
+                    ) }
                     // Màn hình chính
                     composable("home") {
                         NotesHomeScreen(
@@ -92,7 +103,26 @@ class MainActivity : ComponentActivity() {
                             navController = navController,
                             viewModel = viewModel
                         )
+
                     }
+                    composable("login") {
+                        com.example.notesapp.ui.AuthScreen.LoginScreen(
+                            navController = navController,
+                            onLoggedIn = { navController.navigate("home") },
+                            viewModel = viewModel
+                        )
+                    }
+                    composable("register") {
+                        com.example.notesapp.ui.AuthScreen.RegisterScreen(
+                            navController = navController
+                        )
+                    }
+                    composable("forgot") {
+                        com.example.notesapp.ui.AuthScreen.ForgotPasswordScreen(
+                            navController = navController
+                        )
+                    }
+
 
                     // Phân loại
                     composable("categories") {

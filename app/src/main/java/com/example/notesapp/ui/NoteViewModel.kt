@@ -12,6 +12,10 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.State
+import com.example.notesapp.util.AuthManager
+
 
 class NoteViewModel(
     application: Application,
@@ -69,7 +73,7 @@ class NoteViewModel(
 
     // --- Note CRUD ---
     fun addNote(note: Note) {
-        viewModelScope.launch { repository.insert(note) }
+        viewModelScope.launch { `repository`.insert(note) }
     }
 
     fun updateNote(note: Note) {
@@ -99,4 +103,46 @@ class NoteViewModel(
         _darkMode.value = enabled
         SettingsPreferences.setDarkMode(ctx, enabled)
     }
+    // --- User Account Management ---
+    fun setUser(name: String, id: String?) {
+        _userName.value = name
+        _userId.value = id
+    }
+
+    fun logout() {
+        _userName.value = "Khách"
+        _userId.value = null
+    }
+
+    fun isLoggedIn(): Boolean {
+        return _userId.value != null
+    }
+
+    // User info (for login system)
+    private val _userName = mutableStateOf("Khách")
+    val userName: State<String> = _userName
+
+    private val _userId = mutableStateOf<String?>(null)
+    val userId: State<String?> = _userId
+
+    // Auth tạm thời
+    fun loadUserFromPrefs() {
+        val (name, id) = AuthManager.getCurrentUser(ctx)
+        if (name != null && id != null) {
+            _userName.value = name
+            _userId.value = id
+        } else {
+            _userName.value = "Khách"
+            _userId.value = null
+        }
+    }
+
+    fun logoutUser() {
+        AuthManager.signOut(ctx)
+        _userName.value = "Khách"
+        _userId.value = null
+    }
+
+
+
 }
