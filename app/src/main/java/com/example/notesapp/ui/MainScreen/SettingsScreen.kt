@@ -7,6 +7,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.notesapp.ui.NoteViewModel
+import androidx.compose.ui.graphics.vector.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -90,6 +91,17 @@ fun SettingsScreen(
                             Text("Đăng nhập / Đăng ký")
                         }
                     }
+                    Button(
+                        onClick ={
+                            if (userId!=null){
+
+                            }
+                        } ,
+                        modifier = Modifier.fillMaxWidth()
+                    ){
+                            Text("Đồng bộ dữ liệu")
+                    }
+
                 }
             }
 
@@ -121,3 +133,45 @@ fun SettingsScreen(
         }
     }
 }
+@Composable
+fun Alert_ChuaDangNhap(
+    onDismissRequest: () -> Unit,
+    onConfirmation: () -> Unit,
+    dialogTitle: String="Lỗi",
+    dialogText: String="Bạn cần đăng nhập để đông bộ hóa",
+    icon: ImageVector,
+) {
+    AlertDialog(
+        icon = {
+            Icon(icon, contentDescription = " AlertIcon")
+        },
+        title = {
+            Text(text = dialogTitle)
+        },
+        text = {
+            Text(text = dialogText)
+        },
+        onDismissRequest = {
+            onDismissRequest()
+        },
+        confirmButton = {
+            TextButton(
+                onClick = {
+                    onConfirmation()
+                }
+            ) {
+                Text("Xác nhận")
+            }
+        },
+        dismissButton = {
+            TextButton(
+                onClick = {
+                    onDismissRequest()
+                }
+            ) {
+                Text("Dismiss")
+            }
+        }
+    )
+}
+

@@ -52,7 +52,7 @@ android {
 }
 
 dependencies {
-    val roomVersion = "2.6.1"
+    val roomVersion = "2.7.1"
     val navVersion = "2.8.0"
     val lifecycleVersion = "2.8.4"
     val material3Version = "1.2.1"
@@ -94,5 +94,7 @@ dependencies {
     implementation("io.github.jan-tennert.supabase:auth-kt")
     implementation("io.github.jan-tennert.supabase:realtime-kt")
 
-    implementation("io.ktor:ktor-client-okhttp:3.2.0")
+    implementation("io.ktor:ktor-client-okhttp:3.3.0")
+    implementation("io.ktor:ktor-client-core:3.3.0")
+
 }
