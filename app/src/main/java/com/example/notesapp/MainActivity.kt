@@ -90,9 +90,9 @@ class MainActivity : ComponentActivity() {
                             navArgument("noteId") { type = NavType.IntType }
                         )
                     ) { backStackEntry ->
-                        val noteId = backStackEntry.arguments?.getInt("noteId")
+                        val noteId = backStackEntry.arguments?.getString("noteId")
                         NoteEditScreen(
-                            noteId = noteId ?: 0,
+                            noteId = noteId ?: "-1",
                             viewModel = viewModel,
                             onBack = { navController.popBackStack() }
                         )

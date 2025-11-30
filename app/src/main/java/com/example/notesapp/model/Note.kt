@@ -3,12 +3,13 @@ package com.example.notesapp.model
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import kotlinx.serialization.Serializable
+import java.util.UUID
 
 @Serializable
 @Entity(tableName = "notes")
 data class Note(
-    @PrimaryKey(autoGenerate = true) val id: Int = 0,
-    val userId:Int=0,
+    @PrimaryKey val id: String = UUID.randomUUID().toString(),
+    val userId:Int=-1,
     val title: String = "",
     val content: String = "",
     val category: String = "Chưa phân loại",

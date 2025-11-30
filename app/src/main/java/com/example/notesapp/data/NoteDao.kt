@@ -23,5 +23,5 @@ interface NoteDao {
     suspend fun delete(note: Note)
 
     @Query("UPDATE notes SET isPinned = :pinned WHERE id = :noteId")
-    suspend fun updatePinned(noteId: Int, pinned: Boolean)
+    suspend fun updatePinned(noteId: String, pinned: Boolean)
 }

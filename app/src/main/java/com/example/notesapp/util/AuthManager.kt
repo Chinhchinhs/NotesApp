@@ -1,5 +1,6 @@
 package com.example.notesapp.util
 
+import android.R
 import android.content.Context
 import java.util.UUID
 
@@ -14,11 +15,11 @@ object AuthManager {
     suspend fun signUp(context: Context, email: String, password: String): Result<Unit> {
         return if (email.isNotBlank() && password.isNotBlank()) {
             val prefs = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE)
-            val userId = UUID.randomUUID().toString()
+            val userId = kotlin.random.Random.nextInt()
             prefs.edit()
                 .putString(KEY_EMAIL, email)
                 .putString(KEY_PASSWORD, password)
-                .putString(KEY_USER_ID, userId)
+                .putInt(KEY_USER_ID, userId)
                 .apply()
             Result.success(Unit)
         } else {
@@ -52,9 +53,9 @@ object AuthManager {
     }
 
     // Lấy thông tin người dùng hiện tại
-    fun getCurrentUser(context: Context): Pair<String?, String?> {
+    fun getCurrentUser(context: Context): Pair<String?, Int> {
         val prefs = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE)
-        return prefs.getString(KEY_EMAIL, null) to prefs.getString(KEY_USER_ID, null)
+        return prefs.getString(KEY_EMAIL, null) to prefs.getInt(KEY_USER_ID, -1)
     }
 
     // Đăng xuất

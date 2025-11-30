@@ -17,7 +17,7 @@ import com.example.notesapp.util.ExportUtil
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NoteEditScreen(
-    noteId: Int?,
+    noteId: String,
     viewModel: NoteViewModel,
     onBack: () -> Unit
 ) {

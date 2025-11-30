@@ -19,6 +19,10 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
+
+
+        buildConfigField("String","SUPA_URL","\"${project.properties["SUPABASE_URL"]}\"")
+        buildConfigField("String","SUPA_KEY","\"${project.properties["SUPABASE_KEY"]}\"")
     }
 
     buildTypes {
@@ -33,6 +37,7 @@ android {
 
     buildFeatures {
         compose = true
+        buildConfig=true //for loading sensitive data
     }
 
     composeOptions {
@@ -51,6 +56,8 @@ android {
                 jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17)
             }
         }
+
+
     }
 
 

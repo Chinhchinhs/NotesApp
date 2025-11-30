@@ -16,6 +16,7 @@ import androidx.compose.material3.HorizontalDivider
 import com.example.notesapp.data.NoteDao
 import com.example.notesapp.data.NoteRepository
 import com.example.notesapp.model.Note
+import io.github.jan.supabase.BuildConfig
 import io.github.jan.supabase.createSupabaseClient
 import io.github.jan.supabase.postgrest.Postgrest
 import io.github.jan.supabase.postgrest.from
@@ -29,8 +30,9 @@ import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
 
 val supabase = createSupabaseClient(
-    supabaseUrl = ""
-    supabaseKey = ""
+
+            supabaseUrl = com.example.notesapp.BuildConfig.SUPA_URL,
+            supabaseKey = com.example.notesapp.BuildConfig.SUPA_KEY
 ) {
     install(Postgrest)
 }
@@ -93,7 +95,7 @@ fun SettingsScreen(
 
                     Spacer(Modifier.height(8.dp))
 
-                    if (userId != null) {
+                    if (userId >-1) {
                         Button(
                             onClick = {
                                 viewModel.logoutUser()

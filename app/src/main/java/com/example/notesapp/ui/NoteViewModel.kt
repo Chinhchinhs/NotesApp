@@ -104,43 +104,43 @@ class NoteViewModel(
         SettingsPreferences.setDarkMode(ctx, enabled)
     }
     // --- User Account Management ---
-    fun setUser(name: String, id: String?) {
+    fun setUser(name: String, id: Int) {
         _userName.value = name
         _userId.value = id
     }
 
     fun logout() {
         _userName.value = "Khách"
-        _userId.value = null
+        _userId.value = -1
     }
 
     fun isLoggedIn(): Boolean {
-        return _userId.value != null
+        return _userId.value >-1
     }
 
     // User info (for login system)
     private val _userName = mutableStateOf("Khách")
     val userName: State<String> = _userName
 
-    private val _userId = mutableStateOf<String?>(null)
-    val userId: State<String?> = _userId
+    private val _userId = mutableStateOf<Int>(-1)
+    val userId: State<Int> = _userId
 
     // Auth tạm thời
     fun loadUserFromPrefs() {
         val (name, id) = AuthManager.getCurrentUser(ctx)
-        if (name != null && id != null) {
+        if (name != null && id > -1) {
             _userName.value = name
             _userId.value = id
         } else {
             _userName.value = "Khách"
-            _userId.value = null
+            _userId.value = -1
         }
     }
 
     fun logoutUser() {
         AuthManager.signOut(ctx)
         _userName.value = "Khách"
-        _userId.value = null
+        _userId.value = -1
     }
 
 
