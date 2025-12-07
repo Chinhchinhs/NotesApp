@@ -15,7 +15,9 @@ import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.HorizontalDivider
 import com.example.notesapp.data.NoteDao
 import com.example.notesapp.data.NoteRepository
+import com.example.notesapp.data.supaBaseClientProvider
 import com.example.notesapp.model.Note
+import com.example.notesapp.ui.theme.authViewModel
 import io.github.jan.supabase.BuildConfig
 import io.github.jan.supabase.createSupabaseClient
 import io.github.jan.supabase.postgrest.Postgrest
@@ -29,22 +31,17 @@ import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
 
-val supabase = createSupabaseClient(
-
-            supabaseUrl = com.example.notesapp.BuildConfig.SUPA_URL,
-            supabaseKey = com.example.notesapp.BuildConfig.SUPA_KEY
-) {
-    install(Postgrest)
-}
+val supabase = supaBaseClientProvider
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsScreen(
     navController: NavController,
-    viewModel: NoteViewModel,
+    noteViewModel: NoteViewModel,
+    authVM: authViewModel
 ) {
-    val darkMode by viewModel.darkMode.collectAsState()
-    val layoutIsGrid by viewModel.layoutIsGrid.collectAsState()
-    val fontSizeIndex by viewModel.fontSizeIndex.collectAsState()
+    val darkMode by noteViewModel.darkMode.collectAsState()
+    val layoutIsGrid by noteViewModel.layoutIsGrid.collectAsState()
+    val fontSizeIndex by noteViewModel.fontSizeIndex.collectAsState()
 
     Scaffold(
         topBar = {
@@ -72,8 +69,8 @@ fun SettingsScreen(
             )
 
 // Lấy dữ liệu user từ ViewModel
-            val userName by viewModel.userName
-            val userId by viewModel.userId
+            val userName by authVM.userName
+            val userId by authVM.userId
 
             Text(
                 text = "Thông tin tài khoản",
@@ -95,10 +92,10 @@ fun SettingsScreen(
 
                     Spacer(Modifier.height(8.dp))
 
-                    if (userId >-1) {
+                    if (userId !="guest") {
                         Button(
                             onClick = {
-                                viewModel.logoutUser()
+                                authVM.logout()
                                 navController.navigate("home") {
                                     popUpTo("settings") { inclusive = true }
                                 }
@@ -133,7 +130,7 @@ fun SettingsScreen(
 //                            }
                                 //temp
 
-                                val allNote: Flow<List<Note>> = viewModel.notes
+                                val allNote: Flow<List<Note>> = noteViewModel.notes
                             CoroutineScope(Dispatchers.IO).launch {
                                 allNote.collect { notesList ->
                                     println("Received list:")
@@ -166,7 +163,7 @@ fun SettingsScreen(
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Text("Chế độ tối")
-                Switch(checked = darkMode, onCheckedChange = { viewModel.setDarkMode(it) })
+                Switch(checked = darkMode, onCheckedChange = { noteViewModel.setDarkMode(it) })
             }
 
             Row(
@@ -174,13 +171,13 @@ fun SettingsScreen(
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Text("Hiển thị dạng lưới")
-                Switch(checked = layoutIsGrid, onCheckedChange = { viewModel.setLayoutIsGrid(it) })
+                Switch(checked = layoutIsGrid, onCheckedChange = { noteViewModel.setLayoutIsGrid(it) })
             }
 
             Text("Cỡ chữ:")
             Slider(
                 value = fontSizeIndex.toFloat(),
-                onValueChange = { viewModel.setFontSizeIndex(it.toInt()) },
+                onValueChange = { noteViewModel.setFontSizeIndex(it.toInt()) },
                 steps = 1,
                 valueRange = 0f..2f
             )
@@ -226,7 +223,7 @@ private fun syncNote(ls_note: Flow<List<Note>>){
         ls_note.collect { notesList->
             try {
 
-                val result= supabase.from("tbl_note").insert(notesList)
+                val result= supabase.client.from("tbl_note").insert(notesList)
 
             }
             catch (e: Exception){

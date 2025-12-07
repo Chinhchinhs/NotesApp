@@ -6,19 +6,23 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import com.example.notesapp.util.AuthManager
 import kotlinx.coroutines.launch
 import com.example.notesapp.ui.NoteViewModel
+import com.example.notesapp.ui.NoteViewModelFactory
+import com.example.notesapp.ui.theme.authViewModel
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LoginScreen(
     navController: NavController,
-    viewModel: NoteViewModel,
+    viewModel: authViewModel,
     onLoggedIn: (() -> Unit)? = null // optional callback for host wiring
 ) {
     val scope = rememberCoroutineScope()
@@ -77,6 +81,7 @@ fun LoginScreen(
             }
 
             Spacer(Modifier.height(8.dp))
+            OutlinedButton(onClick = {}){Text("Đăng nhập bằng google") }
 
             OutlinedButton(onClick = { navController.navigate("register") }, modifier = Modifier.fillMaxWidth()) {
                 Text("Đăng ký tài khoản")
@@ -95,7 +100,7 @@ fun LoginScreen(
                 loading = true
                 message = null
                 scope.launch {
-                    val r = AuthManager.signInAnonymously()
+                    val r = AuthManager.signInAnonymously(navController.context)
                     loading = false
                     r.onSuccess {
                         onLoggedIn?.invoke()
@@ -116,4 +121,9 @@ fun LoginScreen(
             }
         }
     }
+}
+@Preview(showBackground = true)
+@Composable
+fun showtemp(){
+
 }

@@ -9,11 +9,13 @@ import java.util.UUID
 @Entity(tableName = "notes")
 data class Note(
     @PrimaryKey val id: String = UUID.randomUUID().toString(),
-    val userId:Int=-1,
+    val userId: String="guest",
     val title: String = "",
     val content: String = "",
     val category: String = "Chưa phân loại",
     val backgroundColor: Long = 0xFFFFFFFF,
     val isPinned: Boolean = false,
-    val createdAt: Long = System.currentTimeMillis()
+    val createdAt: Long = System.currentTimeMillis(),
+    val updatedAt: Long = System.currentTimeMillis(),
+    val synced: Boolean=false
 )

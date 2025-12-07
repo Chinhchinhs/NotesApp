@@ -52,20 +52,20 @@ fun RegisterScreen(navController: NavController) {
 
             Button(
                 onClick = {
-                    loading = true
-                    message = null
-                    scope.launch {
-                        val res = AuthManager.signUp(navController.context, email.trim(), password)
-                        loading = false
-                        res.onSuccess {
-                            navController.navigate("login") {
-                                popUpTo("register") { inclusive = true }
-                            }
-
-                        }.onFailure {
-                            message = it.message ?: "Đăng ký thất bại"
-                        }
-                    }
+//                    loading = true
+//                    message = null
+//                    scope.launch {
+//                        val res = AuthManager.signUp(navController.context, email.trim(), password)
+//                        loading = false
+//                        res.onSuccess {
+//                            navController.navigate("login") {
+//                                popUpTo("register") { inclusive = true }
+//                            }
+//
+//                        }.onFailure {
+//                            message = it.message ?: "Đăng ký thất bại"
+//                        }
+//                    }
                 },
                 modifier = Modifier.fillMaxWidth(),
                 enabled = !loading

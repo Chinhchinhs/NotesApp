@@ -9,9 +9,9 @@ interface NoteDao {
     @Query("SELECT * FROM notes ORDER BY isPinned DESC, createdAt DESC")
     fun getAllNotes(): Flow<List<Note>>
     @Query("SELECT * FROM notes where userId=:userId")
-    fun getAllNotesByUserId(userId:Int): Flow<List<Note>>
+    fun getAllNotesByUserId(userId:String): Flow<List<Note>>
     @Query("SELECT * FROM notes WHERE id = :id LIMIT 1")
-    suspend fun getNoteById(id: Int): Note?
+    suspend fun getNoteById(id: String): Note?
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(note: Note): Long

@@ -5,7 +5,7 @@ import androidx.room.PrimaryKey
 import kotlinx.serialization.Serializable
 
 data class User(
-    val userId: Int,
-    val emailAddress:String,
-    val name: String,
+    val userId: String,
+    val supaUserId:String?,
+    val isGuest: Boolean
 )

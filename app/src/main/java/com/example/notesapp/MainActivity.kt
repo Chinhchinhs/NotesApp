@@ -24,28 +24,30 @@ import com.example.notesapp.ui.MainScreen.SettingsScreen
 import com.example.notesapp.ui.theme.NotesAppTheme
 import androidx.compose.runtime.LaunchedEffect
 import com.example.notesapp.ui.AuthScreen.LoginScreen
+import com.example.notesapp.ui.theme.authViewModel
 
 
 class MainActivity : ComponentActivity() {
 
-    private val viewModel: NoteViewModel by viewModels {
+    private val noteViewModel: NoteViewModel by viewModels {
         val dao = NoteDatabase.getDatabase(application).noteDao()
         val repo = NoteRepository(dao)
         NoteViewModelFactory(application, repo)
     }
+    private val authVM: authViewModel by viewModels ( )
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        viewModel.loadUserFromPrefs() //  tự động load user offline khi mở app
+        noteViewModel.loadUserFromPrefs() //  tự động load user offline khi mở app
         setContent {
-            val darkMode by viewModel.darkMode.collectAsState()
-            val fontSizeIndex by viewModel.fontSizeIndex.collectAsState()
+            val darkMode by noteViewModel.darkMode.collectAsState()
+            val fontSizeIndex by noteViewModel.fontSizeIndex.collectAsState()
 
             NotesAppTheme(darkTheme = darkMode, fontSizeIndex = fontSizeIndex) {
                 val navController = rememberNavController()
                 LaunchedEffect(Unit) {
-                    viewModel.loadUserFromPrefs()
+                    noteViewModel.loadUserFromPrefs()
                 }
 
                 NavHost(
@@ -54,13 +56,13 @@ class MainActivity : ComponentActivity() {
                 ) {
                     composable(route="login"){ LoginScreen(
                         navController=navController,
-                        viewModel=viewModel
+                        viewModel=authVM
                     ) }
                     // Màn hình chính
                     composable("home") {
                         NotesHomeScreen(
                             navController = navController,
-                            viewModel = viewModel
+                            viewModel = noteViewModel
                         )
                     }
 
@@ -68,9 +70,9 @@ class MainActivity : ComponentActivity() {
                     composable("addNote") {
                         NoteAddScreen(
                             navController = navController,
-                            viewModel = viewModel,
+                            viewModel = noteViewModel,
                             onSave = { title, content, category ->
-                                viewModel.addNote(
+                                noteViewModel.addNote(
                                     Note(
                                         title = title,
                                         content = content,
@@ -92,7 +94,7 @@ class MainActivity : ComponentActivity() {
                         val noteId = backStackEntry.arguments?.getString("noteId")
                         NoteEditScreen(
                             noteId = noteId ?: "-1",
-                            viewModel = viewModel,
+                            viewModel = noteViewModel,
                             onBack = { navController.popBackStack() }
                         )
                     }
@@ -101,7 +103,8 @@ class MainActivity : ComponentActivity() {
                     composable("settings") {
                         SettingsScreen(
                             navController = navController,
-                            viewModel = viewModel
+                            noteViewModel =noteViewModel,
+                            authVM=authVM
                         )
 
                     }
@@ -109,7 +112,7 @@ class MainActivity : ComponentActivity() {
                         com.example.notesapp.ui.AuthScreen.LoginScreen(
                             navController = navController,
                             onLoggedIn = { navController.navigate("home") },
-                            viewModel = viewModel
+                            viewModel = authVM
                         )
                     }
                     composable("register") {
@@ -127,7 +130,7 @@ class MainActivity : ComponentActivity() {
                     // Phân loại
                     composable("categories") {
                         CategoriesScreen(
-                            viewModel = viewModel,
+                            viewModel = noteViewModel,
                             onBack = { navController.popBackStack() }
                         )
                     }
