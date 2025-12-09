@@ -26,7 +26,7 @@ import com.example.notesapp.ui.theme.NotesAppTheme
 import androidx.compose.runtime.LaunchedEffect
 import androidx.lifecycle.lifecycleScope
 import com.example.notesapp.ui.AuthScreen.LoginScreen
-import com.example.notesapp.ui.theme.authViewModel
+import com.example.notesapp.util.authViewModel
 import com.example.notesapp.util.AuthManager
 import com.example.notesapp.util.AuthManager.handleDeepLink
 import kotlinx.coroutines.launch

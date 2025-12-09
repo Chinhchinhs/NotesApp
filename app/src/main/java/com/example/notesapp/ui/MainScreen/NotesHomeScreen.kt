@@ -36,7 +36,7 @@ import java.text.SimpleDateFormat
 import java.util.*
 import androidx.compose.material.icons.filled.Label
 import androidx.compose.material.icons.sharp.Settings
-import com.example.notesapp.ui.theme.authViewModel
+import com.example.notesapp.util.authViewModel
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable

@@ -17,7 +17,7 @@ import com.example.notesapp.data.NoteDao
 import com.example.notesapp.data.NoteRepository
 import com.example.notesapp.data.supaBaseClientProvider
 import com.example.notesapp.model.Note
-import com.example.notesapp.ui.theme.authViewModel
+import com.example.notesapp.util.authViewModel
 import io.github.jan.supabase.BuildConfig
 import io.github.jan.supabase.createSupabaseClient
 import io.github.jan.supabase.postgrest.Postgrest
@@ -113,17 +113,8 @@ fun SettingsScreen(
                         ) {
                             Text("Đổi mật khẩu")
                         }
-                    } else {
                         Button(
-                            onClick = { navController.navigate("login") },
-                            modifier = Modifier.fillMaxWidth()
-                        ) {
-                            Text("Đăng nhập / Đăng ký")
-                        }
-                    }
-                    var showalert by remember { mutableStateOf(false) }
-                    Button(
-                        onClick ={
+                            onClick ={
 //                            if (userId!=null){
 //
 //                            }
@@ -135,43 +126,53 @@ fun SettingsScreen(
 
 
                                 val allNote: Flow<List<Note>> = noteViewModel.notes
-                            CoroutineScope(Dispatchers.IO).launch {
-                                allNote.collect { notesList ->
-                                    println("Received list:")
-                                    notesList.forEach { note ->
-                                        println("→ ${note.title}: ${note.content}[${note.synced}]")
+                                CoroutineScope(Dispatchers.IO).launch {
+                                    allNote.collect { notesList ->
+                                        println("Received list:")
+                                        notesList.forEach { note ->
+                                            println("→ ${note.title}: ${note.content}[${note.synced}]")
+                                        }
                                     }
                                 }
-                            }
-                            println("Current ID: [${authVM.getUserId()}]")
+                                println("Current ID: [${authVM.getUserId()}]")
 
-                            //sync note from cloud to local
-                            CoroutineScope(Dispatchers.IO).launch {
-                                val result=noteViewModel.fetchNotesFromSupabase(authVM.getUserId())
-                                println("[][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][]")
-                                println(result)
-                                println("[][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][]")
+                                //sync note from cloud to local
+                                CoroutineScope(Dispatchers.IO).launch {
+                                    val result=noteViewModel.fetchNotesFromSupabase(authVM.getUserId())
+                                    println("[][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][]")
+                                    println(result)
+                                    println("[][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][]")
 //                                noteViewModel.mergeSupabaseNotesIntoRoom(result.data)
-                                noteViewModel.mergeSupabaseNotesIntoRoom(result)
-                            }
+                                    noteViewModel.mergeSupabaseNotesIntoRoom(result)
+                                }
 
 
-                            //sync note from local to clould
-                            noteViewModel.syncNotesToCloud(allNote,authVM.getUserId())
-
-
-
+                                //sync note from local to clould
+                                noteViewModel.syncNotesToCloud(allNote,authVM.getUserId())
 
 
 
 
 
-                            //endtemp
-                        } ,
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
+
+
+
+                                //endtemp
+                            } ,
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
                             Text("Đồng bộ dữ liệu")
+                        }
+                    } else {
+                        Button(
+                            onClick = { navController.navigate("login") },
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Text("Đăng nhập / Đăng ký")
+                        }
                     }
+                    var showalert by remember { mutableStateOf(false) }
+
                     Alert_ChuaDangNhap(
                         {showalert=false},
                         "Lỗi",

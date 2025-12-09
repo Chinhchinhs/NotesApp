@@ -8,7 +8,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.example.notesapp.ui.theme.authViewModel
+import com.example.notesapp.util.authViewModel
 import com.example.notesapp.util.AuthManager
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch

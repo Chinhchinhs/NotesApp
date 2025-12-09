@@ -15,7 +15,7 @@ import com.example.notesapp.util.AuthManager
 import kotlinx.coroutines.launch
 import com.example.notesapp.ui.NoteViewModel
 import com.example.notesapp.ui.NoteViewModelFactory
-import com.example.notesapp.ui.theme.authViewModel
+import com.example.notesapp.util.authViewModel
 
 
 @OptIn(ExperimentalMaterial3Api::class)
