@@ -49,7 +49,7 @@ class MainActivity : ComponentActivity() {
 
 
 
-        authVM.loadUserFromPrefs() //  tự động load user offline khi mở app
+        authVM.loadUserFromPrefs()//  tự động load user offline khi mở app
         setContent {
             val darkMode by noteViewModel.darkMode.collectAsState()
             val fontSizeIndex by noteViewModel.fontSizeIndex.collectAsState()
@@ -67,18 +67,20 @@ class MainActivity : ComponentActivity() {
 
                 NavHost(
                     navController = navController,
-                    startDestination = "login"
+                    startDestination = if (authVM.getUserId()=="guest"){"login"}else{"home"}
                 ) {
-                    composable(route="login"){ LoginScreen(
-                        navController=navController,
-                        viewModel=authVM,
-                        noteViewModel=noteViewModel
-                    ) }
+//                    composable(route="login"){ LoginScreen(
+//                        navController=navController,
+//                        viewModel=authVM,
+//                        noteViewModel=noteViewModel
+//                    ) }
                     // Màn hình chính
                     composable("home") {
+
                         NotesHomeScreen(
                             navController = navController,
-                            viewModel = noteViewModel
+                            viewModel = noteViewModel,
+                            authVM
                         )
                     }
 

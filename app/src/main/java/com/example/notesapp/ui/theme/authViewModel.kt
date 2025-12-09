@@ -13,12 +13,12 @@ class authViewModel(application: Application) : AndroidViewModel(application) {
     private val ctx = application.applicationContext
     private val _signUpResult = MutableStateFlow<Result<Unit>?>(null)
 
-    private val _userName = mutableStateOf("Guest")
+    private val _userName = mutableStateOf<String?>(null)
 
-    val userName: State<String> = _userName
+    val userName: State<String?> = _userName
 
-    private val _userId = mutableStateOf("guest")
-    val userId: State<String> = _userId
+    private val _userId = mutableStateOf<String?>(null)
+    val userId: State<String?> = _userId
 
     fun loadUser() {
         val (name, id) = AuthManager.getCurrentUser(ctx)
@@ -47,7 +47,7 @@ class authViewModel(application: Application) : AndroidViewModel(application) {
          viewModelScope.launch {
 
              AuthManager.signOut(ctx)
-             _userName.value = "Guest"
+             _userName.value = "Khách"
              _userId.value = "guest"
          }
     }
@@ -71,6 +71,10 @@ class authViewModel(application: Application) : AndroidViewModel(application) {
     fun getUserId(): String{
         val (name, id) = AuthManager.getCurrentUser(ctx)
         return id.toString()
+    }
+    fun getUserEmail(): String{
+        val (name, id) = AuthManager.getCurrentUser(ctx)
+        return name.toString()
     }
 
 }

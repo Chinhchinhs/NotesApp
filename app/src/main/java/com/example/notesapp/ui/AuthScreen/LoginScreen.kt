@@ -69,9 +69,9 @@ fun LoginScreen(
                     loading = false
                     res.onSuccess {
                         viewModel.loadUserFromPrefs() //cập nhật ngay
-                        val userId= viewModel.getUserId()
-
-                        noteViewModel.updateUserAfterLogin(userId)
+                        val (email,userId)= AuthManager.getCurrentUser(navController.context)
+                        println(userId)
+                        noteViewModel.updateUserAfterLogin(userId.toString())
                         onLoggedIn?.invoke()
                         navController.navigate("home") {
                             popUpTo("login") { inclusive = true }

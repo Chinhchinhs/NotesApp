@@ -17,7 +17,9 @@ import androidx.compose.runtime.State
 import com.example.notesapp.data.supaBaseClientProvider
 import com.example.notesapp.model.NoteDto
 import com.example.notesapp.util.AuthManager
+import io.github.jan.supabase.postgrest.Postgrest
 import io.github.jan.supabase.postgrest.from
+import io.github.jan.supabase.postgrest.result.PostgrestResult
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.coroutineScope
@@ -74,6 +76,7 @@ class NoteViewModel(
     // Move note to category
     fun moveNoteToCategory(note: Note, newCategory: String) {
         viewModelScope.launch {
+            note.synced=false
             repository.update(note.copy(category = newCategory))
         }
     }
@@ -170,8 +173,11 @@ class NoteViewModel(
     )
 
 
-     fun syncNotes(ls_note: Flow<List<Note>>) {
+     fun syncNotesToCloud(ls_note: Flow<List<Note>>,currentUserID:String) {
+
+
         CoroutineScope(Dispatchers.IO).launch {
+
             ls_note.collect { notesList ->
                 notesList.forEach { note ->
                     try {
@@ -201,6 +207,7 @@ class NoteViewModel(
                     }
                 }
             }
+
         }
     }
      fun updateUserAfterLogin(userID:String) {
@@ -209,5 +216,51 @@ class NoteViewModel(
              repository.updateUserAfterLogin(userID)
          }
      }
+    suspend fun fetchNotesFromSupabase(userId: String): List<NoteDto> {
+        val result: PostgrestResult = supaBaseClientProvider.client.from("tbl_note").select(){
+            filter { eq("userId",userId)}
+        }
+        val notes= result.decodeList<NoteDto>()
+        return notes
+    }
+    fun NoteDto.toNote(): Note {
+        return Note(
+            id = id,
+            userId = userId,
+            title = title,
+            content = content,
+            category = category,
+            backgroundColor = backgroundColor,
+            isPinned = isPinned,
+            createdAt = createdAt,
+            updatedAt = updatedAt,
+            synced = true,
+            isDeleted = false
+        )
+    }
 
+
+    fun mergeSupabaseNotesIntoRoom(notesFromCloud: List<NoteDto>) {
+        viewModelScope.launch(Dispatchers.IO) {
+            notesFromCloud.forEach { cloudNote ->
+                val localNote = repository.getNoteById(cloudNote.id)
+
+                when {
+                    localNote == null -> {
+                        // Note doesn't exist locally -> insert
+                        repository.insert(cloudNote.toNote())
+                    }
+                    !localNote.synced -> {
+                        // Local note has unsynced changes -> skip cloud version
+                        return@forEach
+                    }
+                    else -> {
+                        // Local note exists and is synced -> update fields
+                        repository.update(cloudNote.toNote())
+                    }
+                }
+            }
+        }
+        print(notesFromCloud)
+    }
 }

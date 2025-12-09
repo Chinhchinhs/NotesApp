@@ -3,6 +3,7 @@ package com.example.notesapp.util
 import android.R
 import android.content.Context
 import android.net.Uri
+import android.os.UserManager
 import com.example.notesapp.data.GuestManager
 import com.example.notesapp.data.GuestManager.setGuestMode
 import com.example.notesapp.data.supaBaseClientProvider
@@ -127,8 +128,8 @@ object AuthManager {
 
         // Fallback to locally saved session (offline/guest)
         val prefs = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE)
-        val email = prefs.getString(KEY_EMAIL, null)
-        val userId = prefs.getString(KEY_USER_ID, null)
+        val email = prefs.getString(KEY_EMAIL, "Khách")
+        val userId = prefs.getString(KEY_USER_ID, "guest")
         return email to userId
     }//    // Đăng xuất
 //    fun signOut(context: Context) {
@@ -138,6 +139,7 @@ object AuthManager {
 
     suspend fun signOut(context: Context) {
         GuestManager.clearGuest(context)
+
         supaSessionStorage.clearSession(context)
         supaBaseClientProvider.client.auth.signOut()
     }

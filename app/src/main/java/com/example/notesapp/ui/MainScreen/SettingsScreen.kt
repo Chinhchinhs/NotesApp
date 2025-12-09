@@ -22,6 +22,7 @@ import io.github.jan.supabase.BuildConfig
 import io.github.jan.supabase.createSupabaseClient
 import io.github.jan.supabase.postgrest.Postgrest
 import io.github.jan.supabase.postgrest.from
+import io.github.jan.supabase.postgrest.result.PostgrestResult
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -30,6 +31,7 @@ import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
+import okhttp3.Dispatcher
 
 val supabase = supaBaseClientProvider
 @OptIn(ExperimentalMaterial3Api::class)
@@ -69,8 +71,8 @@ fun SettingsScreen(
             )
 
 // Lấy dữ liệu user từ ViewModel
-            val userName by authVM.userName
-            val userId by authVM.userId
+            val userId = authVM.getUserId()
+            val userEmail = authVM.getUserEmail()
 
             Text(
                 text = "Thông tin tài khoản",
@@ -87,7 +89,7 @@ fun SettingsScreen(
                     modifier = Modifier.padding(16.dp),
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    Text("Tên: $userName")
+                    Text("Email: $userEmail")
                     Text("ID: ${userId ?: "Chưa đăng nhập"}")
 
                     Spacer(Modifier.height(8.dp))
@@ -130,6 +132,8 @@ fun SettingsScreen(
 //                            }
                                 //temp
 
+
+
                                 val allNote: Flow<List<Note>> = noteViewModel.notes
                             CoroutineScope(Dispatchers.IO).launch {
                                 allNote.collect { notesList ->
@@ -140,7 +144,26 @@ fun SettingsScreen(
                                 }
                             }
                             println("Current ID: [${authVM.getUserId()}]")
-                            noteViewModel.syncNotes(allNote)
+
+                            //sync note from cloud to local
+                            CoroutineScope(Dispatchers.IO).launch {
+                                val result=noteViewModel.fetchNotesFromSupabase(authVM.getUserId())
+                                println("[][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][]")
+                                println(result)
+                                println("[][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][]")
+//                                noteViewModel.mergeSupabaseNotesIntoRoom(result.data)
+                                noteViewModel.mergeSupabaseNotesIntoRoom(result)
+                            }
+
+
+                            //sync note from local to clould
+                            noteViewModel.syncNotesToCloud(allNote,authVM.getUserId())
+
+
+
+
+
+
 
 
                             //endtemp

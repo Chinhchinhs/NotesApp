@@ -36,13 +36,16 @@ import java.text.SimpleDateFormat
 import java.util.*
 import androidx.compose.material.icons.filled.Label
 import androidx.compose.material.icons.sharp.Settings
+import com.example.notesapp.ui.theme.authViewModel
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun NotesHomeScreen(
     navController: NavController,
-    viewModel: NoteViewModel
+    viewModel: NoteViewModel,
+    authVM: authViewModel
 ) {
+    authVM.loadUserFromPrefs()
     val context = LocalContext.current
 
     // states from ViewModel
@@ -53,6 +56,7 @@ fun NotesHomeScreen(
     val layoutIsGrid by viewModel.layoutIsGrid.collectAsState()
     val darkMode by viewModel.darkMode.collectAsState()
 
+
     // UI local states
     var contextMenuNote by remember { mutableStateOf<Note?>(null) }
     var showDeleteConfirmFor by remember { mutableStateOf<Note?>(null) }
@@ -60,15 +64,23 @@ fun NotesHomeScreen(
     var showAddCategoryDialog by remember { mutableStateOf(false) }
     var newCategoryName by remember { mutableStateOf("") }
     var searchQuery by remember { mutableStateOf("") }  // update new: state cho search
-
+    val currentUser by authVM.userId
     // map font index to sizes (safe)
     val fontSizes = listOf(14.sp, 16.sp, 18.sp)
     val fontSize = fontSizes.getOrElse(fontSizeIndex.coerceIn(0, fontSizes.lastIndex)) { 16.sp }
 
     // compute displayed list:
     val notdeleted = notes.filter { !it.isDeleted }
-    val pinned = notdeleted.filter { it.isPinned }
-    val others = notdeleted.filter { !it.isPinned &&
+//    val currentUser=authVM.getUserId()
+
+    val sourceNotes= if (currentUser=="guest"){
+        notdeleted.filter { it.userId == "guest" }
+    }
+    else{
+        notdeleted.filter { it.userId == "guest" || it.userId == currentUser }
+    }
+    val pinned = sourceNotes.filter { it.isPinned }
+    val others = sourceNotes.filter { !it.isPinned &&
             (selectedCategory == "Tất cả"
                     || (selectedCategory == "Chưa phân loại" && it.category.isBlank())
                     || it.category == selectedCategory)
