@@ -19,6 +19,9 @@ class authViewModel(application: Application) : AndroidViewModel(application) {
     private val _userId = mutableStateOf<String?>(null)
     val userId: State<String?> = _userId
 
+
+
+
     fun loadUser() {
         val (name, id) = AuthManager.getCurrentUser(ctx)
         _userName.value = name ?: "Guest"

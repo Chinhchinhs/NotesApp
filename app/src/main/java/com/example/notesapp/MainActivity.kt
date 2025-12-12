@@ -1,7 +1,9 @@
 package com.example.notesapp
 
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
@@ -45,25 +47,18 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
 
         super.onCreate(savedInstanceState)
-        lifecycleScope.launch { handleDeepLink(intent )}
-
 
 
         authVM.loadUserFromPrefs()//  tự động load user offline khi mở app
+
+
         setContent {
             val darkMode by noteViewModel.darkMode.collectAsState()
             val fontSizeIndex by noteViewModel.fontSizeIndex.collectAsState()
 
             NotesAppTheme(darkTheme = darkMode, fontSizeIndex = fontSizeIndex) {
                 val navController = rememberNavController()
-                LaunchedEffect(Unit) {
-                    noteViewModel.loadUserFromPrefs()
-                    if(intent.getBooleanExtra("reset_ready",false)){
-                        navController.navigate("newp_password"){
-                            popUpTo("login"){inclusive=false}
-                        }
-                    }
-                }
+
 
                 NavHost(
                     navController = navController,
@@ -164,26 +159,10 @@ class MainActivity : ComponentActivity() {
         }
 
     }
-     override fun onNewIntent(intent: Intent) {
-        super.onNewIntent(intent)
-        lifecycleScope.launch {
-            handleDeepLink(intent.data!!)
-        }
-    }
-     fun handleDeepLink(intent: Intent) {
-        val uri = intent.data ?: return
 
-        lifecycleScope.launch {
-            val ok = AuthManager.handleDeepLink(uri)
-            if (ok) {
-                startActivity(Intent(this@MainActivity, MainActivity::class.java).apply {
-                    putExtra("reset_ready", true)
-                })
-            }
 
-        }
 
-    }
+
 }
 
 

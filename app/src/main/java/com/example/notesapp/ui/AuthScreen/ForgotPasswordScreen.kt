@@ -46,7 +46,6 @@ fun ForgotPasswordScreen(navController: NavController) {
                     res.onSuccess {
 
                         message = "Đã gửi liên kết khôi phục tới $email"
-//                        navController.navigate("new_password")
                     }.onFailure {
                         message = it.message ?: "Khôi phục thất bại"
                     }
