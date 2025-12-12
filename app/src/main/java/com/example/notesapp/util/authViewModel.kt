@@ -25,15 +25,15 @@ class authViewModel(application: Application) : AndroidViewModel(application) {
         _userId.value = id ?: "guest"
     }
 
-    suspend fun login(email: String, password: String): Result<Unit> {
-        val result = AuthManager.signInWithEmail(ctx, email, password)
-        if (result.isSuccess) {
-            val (name, id) = AuthManager.getCurrentUser(ctx)
-            _userName.value = name ?: "User"
-            _userId.value = id ?: "guest"
-        }
-        return result
-    }
+//    suspend fun login(email: String, password: String): Result<Unit> {
+//        val result = AuthManager.signInWithEmail(ctx, email, password)
+//        if (result.isSuccess) {
+//            val (name, id) = AuthManager.getCurrentUser(ctx)
+//            _userName.value = name ?: "User"
+//            _userId.value = id ?: "guest"
+//        }
+//        return result
+//    }
 
     suspend fun loginAsGuest(): String {
         val guestId = AuthManager.signInAnonymously(ctx).getOrThrow()
@@ -75,5 +75,4 @@ class authViewModel(application: Application) : AndroidViewModel(application) {
         val (name, id) = AuthManager.getCurrentUser(ctx)
         return name.toString()
     }
-
 }

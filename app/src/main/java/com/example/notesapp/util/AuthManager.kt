@@ -205,4 +205,18 @@ object AuthManager {
 
     }
 
+    suspend fun verifyPassword(email: String, password: String): Boolean {
+
+
+        return try {
+            client.auth.signInWith(Email) {
+                this.email = email
+                this.password = password
+            }
+            true  // password is correct
+        } catch (e: Exception) {
+            false // incorrect password
+        }
+    }
+
 }
