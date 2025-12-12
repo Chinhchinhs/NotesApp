@@ -1,10 +1,14 @@
 package com.example.notesapp.ui.AuthScreen
 
 
+import android.R
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
+import androidx.compose.material.icons.materialIcon
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -90,7 +94,34 @@ fun LoginScreen(
             }
 
             Spacer(Modifier.height(8.dp))
-            OutlinedButton(onClick = {}){Text("Đăng nhập bằng google") }
+            Button (onClick = {
+                loading = true
+                message = null
+                scope.launch {
+                    val res = AuthManager.signInWithGoogle(navController.context)
+                    loading = false
+                    res.onSuccess {
+                        viewModel.loadUserFromPrefs() //cập nhật ngay
+                        val (email,userId)= AuthManager.getCurrentUser(navController.context)
+                        println(userId)
+                        noteViewModel.updateUserAfterLogin(userId.toString())
+                        onLoggedIn?.invoke()
+                        navController.navigate("home") {
+                            popUpTo("login") { inclusive = true }
+                        }
+                    }.onFailure { error->
+//                        message = when {
+//                            error.message?.contains("Invalid login credentials", true) == true ->
+//                                "Sai email hoặc mật khẩu"
+//                            else ->
+//                              "Đăng nhập thất bại"
+//                        }
+                        message = error.message
+                    }
+                }
+            }, modifier = Modifier.fillMaxWidth(), enabled = !loading) {
+                Text(if (loading) "Đang đăng nhập..." else "Đăng nhập bằng tài khoản Google")
+            }
 
             OutlinedButton(onClick = { navController.navigate("register") }, modifier = Modifier.fillMaxWidth()) {
                 Text("Đăng ký tài khoản")

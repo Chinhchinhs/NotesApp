@@ -4,13 +4,20 @@ import android.R
 import android.content.Context
 import android.net.Uri
 import android.os.UserManager
+import androidx.credentials.CredentialManager
+import androidx.credentials.GetCredentialRequest
 import com.example.notesapp.data.GuestManager
 import com.example.notesapp.data.GuestManager.setGuestMode
 import com.example.notesapp.data.supaBaseClientProvider
 import com.example.notesapp.data.supaSessionStorage
 import com.example.notesapp.ui.MainScreen.supabase
+import com.google.android.libraries.identity.googleid.GetGoogleIdOption
+import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import io.github.jan.supabase.auth.auth
+import io.github.jan.supabase.auth.providers.Google
 import io.github.jan.supabase.auth.providers.builtin.Email
+import io.github.jan.supabase.auth.providers.builtin.IDToken
+import java.security.MessageDigest
 import java.util.UUID
 
 object AuthManager {
@@ -154,6 +161,48 @@ object AuthManager {
         }catch (e: Exception){
             Result.failure(e)
         }
+    }
+    fun createNonce(): String{
+        val rawNonce=UUID.randomUUID().toString()
+        val bytes= rawNonce.toByteArray()
+        val md= MessageDigest.getInstance("SHA-256")
+        val digest = md.digest(bytes)
+        return digest.fold(""){
+            str, it ->str+"%02x".format(it)
+        }
+    }
+    suspend fun signInWithGoogle(context: Context): Result<Unit>{
+        val hashedNonce = createNonce()
+
+        val googleIdOption = GetGoogleIdOption.Builder()
+            .setServerClientId(com.example.notesapp.BuildConfig.GOOGLE_AUTH_CLIENT)
+            .setNonce(hashedNonce)
+            .setAutoSelectEnabled(false)
+            .setFilterByAuthorizedAccounts(false)
+            .build()
+        val request= GetCredentialRequest.Builder()
+            .addCredentialOption(googleIdOption)
+            .build()
+        val credentialManager= CredentialManager.create(context)
+        return  try{
+            val result= credentialManager.getCredential(context,request)
+            val googleIdTokenCredential= GoogleIdTokenCredential.createFrom(result.credential.data)
+            val googleIdToken=googleIdTokenCredential.idToken
+            supabase.client.auth.signInWith(IDToken){
+                idToken=googleIdToken
+                provider= Google
+            }
+            val session= client.auth.currentSessionOrNull() ?: return Result.failure(Exception("No session available"))
+            supaSessionStorage.saveSession(context,session)
+            setGuestMode(context, false)
+            Result.success(Unit)
+        }
+
+        catch (e:Exception){
+            Result.failure(e)
+        }
+
+
     }
 
 }

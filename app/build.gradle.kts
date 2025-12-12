@@ -23,6 +23,7 @@ android {
 
         buildConfigField("String","SUPA_URL","\"${project.properties["SUPABASE_URL"]}\"")
         buildConfigField("String","SUPA_KEY","\"${project.properties["SUPABASE_KEY"]}\"")
+        buildConfigField("String","GOOGLE_AUTH_CLIENT", "\"${project.properties["GOOGLE_CLIENT"]}\"")
     }
 
     buildTypes {
@@ -116,5 +117,10 @@ dependencies {
 
     implementation("io.ktor:ktor-client-okhttp:3.3.0")
     implementation("io.ktor:ktor-client-core:3.3.0")
+
+    // Google dependencies
+    implementation("androidx.credentials:credentials:1.5.0")
+    implementation("androidx.credentials:credentials-play-services-auth:1.5.0")
+    implementation("com.google.android.libraries.identity.googleid:googleid:1.1.1")
 
 }
