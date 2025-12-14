@@ -234,7 +234,7 @@ suspend fun syncNotesToCloud(
 ) {
     withContext(Dispatchers.IO) {
 
-        val notesList = ls_note.first() // 🔑 ONE emission only
+        val notesList = ls_note.first()
 
         for (note in notesList) {
             try {
@@ -317,15 +317,15 @@ suspend fun syncNotesToCloud(
 
                 when {
                     localNote == null -> {
-                        // Note doesn't exist locally -> insert
+                        // note doesn't exist locally then insert
                         repository.insert(cloudNote.toNote())
                     }
                     !localNote.synced -> {
-                        // Local note has unsynced changes -> skip cloud version
+                        // Local note has unsynced changes then skip cloud version
                         return@forEach
                     }
                     else -> {
-                        // Local note exists and is synced -> update fields
+                        // local note exists and is synced then update fields
                         if(cloudNote.updatedAt>localNote.updatedAt)
                         repository.update(cloudNote.toNote())
                     }
