@@ -1,6 +1,7 @@
 package com.example.notesapp.ui
 
 import android.app.Application
+import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.notesapp.data.NoteRepository
@@ -24,6 +25,8 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.withContext
 
 
 class NoteViewModel(
@@ -173,44 +176,111 @@ class NoteViewModel(
     )
 
 
-     fun syncNotesToCloud(ls_note: Flow<List<Note>>,currentUserID:String) {
+//     fun syncNotesToCloud(ls_note: Flow<List<Note>>,currentUserID:String) {
+//
+//
+//        CoroutineScope(Dispatchers.IO).launch {
+//
+//            ls_note.collect { notesList ->
+//                notesList.forEach { note ->
+//                    try {
+//                        // If note is locally marked deleted
+//                        if (note.isDeleted) {
+//                            supaBaseClientProvider.client.from("tbl_note").delete{
+//                                filter {
+//                                    eq("id",note.id)
+//                                    eq("userId",note.userId)
+//
+//                                }
+//
+//                            }
+//                            deleteNote(note)
+//
+//                        } else if (!note.synced) {
+//                            val dto = note.toDto()
+////                            val req_check= supaBaseClientProvider.client.from("tbl_note").select { filter { eq("id",dto.id) } }
+////                            val remoteNotes = req_check.decodeAs<List<NoteDto>>()
+////                            val remoteNote = remoteNotes.firstOrNull()
+////
+////                            if( remoteNote==null || dto.updatedAt > remoteNote.updatedAt) {
+////                                val request =
+////                                    supaBaseClientProvider.client.from("tbl_note").upsert(dto) {
+////                                        onConflict = "id"
+////                                    }
+////                                // mark note as synced in local DB
+////                                repository.markDownAsSynced(note.id,true)
+////                            }
+//
+//                                val request =
+//                                    supaBaseClientProvider.client.from("tbl_note").upsert(dto) {
+//                                        onConflict = "id"
+//                                    }
+//                                // mark note as synced in local DB
+//                                repository.markDownAsSynced(note.id,true)
+//
+//
+//                        }
+//                    } catch (e: Exception) {
+//                        println(e.message)
+//                    }
+//                }
+//            }
+//
+//        }
+//    }
+suspend fun syncNotesToCloud(
+    ls_note: Flow<List<Note>>,
+    currentUserID: String
+) {
+    withContext(Dispatchers.IO) {
 
+        val notesList = ls_note.first() // 🔑 ONE emission only
 
-        CoroutineScope(Dispatchers.IO).launch {
-
-            ls_note.collect { notesList ->
-                notesList.forEach { note ->
-                    try {
-                        // If note is locally marked deleted
-                        if (note.isDeleted) {
-                            supaBaseClientProvider.client.from("tbl_note").delete{
-                                filter {
-                                    eq("id",note.id)
-                                    eq("userId",note.userId)
-
-                                }
-                                deleteNote(note)
+        for (note in notesList) {
+            try {
+                if (note.isDeleted) {
+                    supaBaseClientProvider.client
+                        .from("tbl_note")
+                        .delete {
+                            filter {
+                                eq("id", note.id)
+                                eq("userId", note.userId)
                             }
-
-                        } else if (!note.synced) {
-                            val dto = note.toDto()
-
-                            val request= supaBaseClientProvider.client.from("tbl_note").upsert(dto){
-                                onConflict="id"
-                            }
-
-                            // mark note as synced in local DB
-                            repository.markDownAsSynced(note.id,true)
                         }
-                    } catch (e: Exception) {
-                        println(e.message)
+
+                    repository.delete(note)
+
+                } else if (!note.synced) {
+
+                    val dto = note.toDto()
+
+                    val remoteNotes =
+                        supaBaseClientProvider.client
+                            .from("tbl_note")
+                            .select { filter { eq("id", dto.id) } }
+                            .decodeAs<List<NoteDto>>()
+
+                    val remoteNote = remoteNotes.firstOrNull()
+
+                    if (remoteNote == null || dto.updatedAt > remoteNote.updatedAt) {
+                        supaBaseClientProvider.client
+                            .from("tbl_note")
+                            .upsert(dto) {
+                                onConflict = "id"
+                            }
+
+                        repository.markDownAsSynced(note.id, true)
                     }
                 }
-            }
 
+            } catch (e: Exception) {
+                Log.e("SYNC", "Failed syncing note ${note.id}", e)
+            }
         }
     }
-     fun updateUserAfterLogin(userID:String) {
+}
+
+    fun updateUserAfterLogin(userID:String) {
          viewModelScope.launch {
 
              repository.updateUserAfterLogin(userID)
@@ -256,6 +326,7 @@ class NoteViewModel(
                     }
                     else -> {
                         // Local note exists and is synced -> update fields
+                        if(cloudNote.updatedAt>localNote.updatedAt)
                         repository.update(cloudNote.toNote())
                     }
                 }

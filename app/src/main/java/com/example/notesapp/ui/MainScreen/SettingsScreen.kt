@@ -148,7 +148,11 @@ fun SettingsScreen(
 
 
                                 //sync note from local to clould
-                                noteViewModel.syncNotesToCloud(allNote,authVM.getUserId())
+                                CoroutineScope(Dispatchers.IO).launch {
+
+                                    noteViewModel.syncNotesToCloud(allNote,authVM.getUserId())
+
+                                }
 
 
 
