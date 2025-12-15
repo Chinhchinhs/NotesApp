@@ -91,6 +91,7 @@ class NoteViewModel(
 
     fun updateNote(note: Note) {
         viewModelScope.launch {
+            note.updatedAt= System.currentTimeMillis()
             note.synced=false
             repository.update(note)
 

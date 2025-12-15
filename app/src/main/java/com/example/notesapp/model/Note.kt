@@ -16,7 +16,7 @@ data class Note(
     val backgroundColor: Long = 0xFFFFFFFF,
     val isPinned: Boolean = false,
     val createdAt: Long = System.currentTimeMillis(),
-    val updatedAt: Long = System.currentTimeMillis(),
+    var updatedAt: Long = System.currentTimeMillis(),
     var synced: Boolean=false,
     var isDeleted: Boolean=false
 )
