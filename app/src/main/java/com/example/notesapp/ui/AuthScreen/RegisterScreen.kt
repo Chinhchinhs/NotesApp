@@ -36,7 +36,7 @@ fun RegisterScreen(navController: NavController) {
             OutlinedTextField(
                 value = email,
                 onValueChange = { email = it },
-                label = { Text("Email hoặc số điện thoại") },
+                label = { Text("Email ") },
                 singleLine = true,
                 modifier = Modifier.fillMaxWidth()
             )
